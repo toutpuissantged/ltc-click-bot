@@ -1,243 +1,301 @@
-# Hamo_AlRayeq
+from telethon import TelegramClient, sync, events
+from telethon.tl.functions.messages import (
+    GetHistoryRequest,
+    GetBotCallbackAnswerRequest,
+)
+from telethon.errors import SessionPasswordNeededError
+from telethon.errors import FloodWaitError
+from time import sleep
+import json, re, sys, os
 
-import asyncio
-import logging
-import re
-import time
-import os
-import sys
-import requests
-import time
+try:
+    import requests
+    from bs4 import BeautifulSoup
+except:
+    print(
+        "\033[1;30m# \033[1;31mHmmm Sepertinya Modul Requests Dan Bs4 Belum Terinstall\n\033[1;30m# \033[1;31mTo install Please Type pip install requests and pip install bs4"
+    )
+    sys.exit()
 
-logging.basicConfig(level=logging.ERROR)
+c = requests.Session()
 
-from telethon.tl.types import UpdateShortMessage,ReplyInlineMarkup,KeyboardButtonUrl
-from telethon import TelegramClient, events
-from telethon.tl.functions.channels import JoinChannelRequest
-from telethon.tl.functions.messages import GetBotCallbackAnswerRequest
-from datetime import datetime
-from colorama import Fore, init as color_ama
-from bs4 import BeautifulSoup
 
-color_ama(autoreset=True)
+banner = """\033[0;35m       __       _       __
+      / /__    (_)___ _/ /______ _
+ __  / / _ \  / / __ `/ //_/ __ `/
+/ /_/ /  __/ / / /_/ / ,< / /_/ /
+\____/\___/_/ /\__,_/_/|_|\__,_/
+         /___/
+\033[0;34m=========================================================
+\033[1;32mAuthor By  \033[1;31m :\033[1;0m Kadal15
+\033[1;32mChannel Yt\033[1;31m  : \033[1;0mAbaykan
+\033[1;32mSupported By \033[1;31m:\033[1;0m ALFRED❤️
+\033[1;32mGithub \033[1;31m:\033[1;0m github.com/misqwin/ltc-click-bot"""
 
-os.system('cls' if os.name=='nt' else 'clear')
+if not os.path.exists("session"):
+    os.makedirs("session")
 
-# Get your own values from my.telegram.org
-api_id = 800812
-api_hash = 'db55ad67a98df35667ca788b97f771f5'
+print(banner)
+if len(sys.argv) < 2:
+    print("\n\n\n\033[1;32mUsage : python main.py +62")
+    sys.exit(1)
 
-# WELCOME BLOCK
-print(Fore.MAGENTA + '               __      _____ _    ___ ___  __  __ ___ ')
-print(Fore.MAGENTA + '               \ \    / / __| |  / __/ _ \|  \/  | __|')
-print(Fore.MAGENTA + '                \ \/\/ /| _|| |_| (_| (_) | |\/| | _| ')
-print(Fore.MAGENTA + '                 \_/\_/ |___|____\___\___/|_|  |_|___|\n' + Fore.RESET)
-print(Fore.BLUE + '   -                   Click Bot Script Top Secret                  -' + Fore.RESET)
-print('')
-print(Fore.YELLOW + '   -                    Modified by:' + Fore.RED +' Hamo_AlRayeq ' + Fore.WHITE +'  ' + Fore.YELLOW +'                  -')
-# DESCRIPTION BLOCK
-print('')
-print(Fore. GREEN + '                      -       Egy Airdrop      -          ')
-# Bot options
-print(Fore.CYAN + ' Options: \n')
 
-option = ("Dogecoin_click_bot", "Litecoin_click_bot", "BCH_clickbot", "Zcash_click_bot", "Bitcoinclick_bot") #Bot option list
-# Print bot options list with numberings
-for number, letter in enumerate(option):
-    print(	"	", number, letter)
-# Ask user to select bot
-ask = int(input (Fore.WHITE + "	\n	Which bot do you want to run?" + Fore.WHITE + " (Choose Number)" + Fore.RESET + ":" ))
-answer = (option[ask])
-url_channel = answer
+def password():
+    c = requests.Session()
 
-def print_msg_time(message):
-	print('[' + Fore.CYAN + f'{datetime.now().strftime("%H:%M:%S")}' + Fore.RESET + f'] {message}')
+    if not os.path.exists(".password"):
+        os.makedirs(".password")
 
-def get_response(url, method='GET'):
-	response = requests.request(method, url, headers={"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win32; x86) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36"}, timeout=15)
-	text_response = response.text
-	status_code = response.status_code
-	return[status_code, text_response]
-		
-async def main():
-	print(Fore.GREEN + url_channel + Fore.RESET + " selected.\n")
-	print(Fore.MAGENTA + '                       - Click Bot Script Menu -\n')
-	# Bot options
-	print(Fore.WHITE + ' Options: \n')
-	action = ["Visit", "Join"] #Bot option list
-	# Print bot options list with numberings
-	for number, letter in enumerate(action):
-		print(	"	", number, letter)
-	# Ask user to select bot
-	ask_action = int(input (Fore.WHITE + "	\n	What bot's action do you want to perform?" + Fore.WHITE + " (Choose Number)" + Fore.RESET + ":" ))
-	answer = (action[ask_action])
-	bot_action = answer
-	if answer == action[0]:
-		print(action[0] + " performed")
-				# Check if phone number is not specified
-		if len(sys.argv) < 2:
-			print('Usage: python start.py phone_number')
-			print('-> Input number in international format (example: +212345678910)\n')
-			e = input('Press any key to exit...')
-			exit(1)
-			
-		phone_number = sys.argv[1]
-		
-		if not os.path.exists("session"):
-			os.mkdir("session")
-	   
-		# Connect to client
-		client = TelegramClient('session/' + phone_number, api_id, api_hash)
-		await client.start(phone_number)
-		me = await client.get_me()
-		ads_channel = "Egyairdrob"
-		await client(JoinChannelRequest(ads_channel))
-		ads_group = "egyairdeop"
-		await client(JoinChannelRequest(ads_group))
-		print('Current account:' + Fore.CYAN + f'  {me.first_name} {me.last_name}  ({me.username})\n' + Fore.RESET)
-		print_msg_time(Fore.YELLOW + 'Sending /visit command' + Fore.RESET)
-		
-		
-	
-        
-   
-		# Start command /visit
-		await client.send_message(url_channel, '/visit')
-		
-		# Start visiting the ads
-		@client.on(events.NewMessage(chats=url_channel, incoming=True))
-		async def visit_ads(event):
-		
-		
-			original_update = event.original_update
-			if type(original_update)is not UpdateShortMessage:
-				if hasattr(original_update.message,'reply_markup') and type(original_update.message.reply_markup) is ReplyInlineMarkup:
-					url = event.original_update.message.reply_markup.rows[0].buttons[0].url
-					#url = event.message.reply_markup.rows[0].buttons[0].url
-				
-					if url is not None:
-						print_msg_time(Fore.WHITE  +'Visiting website...')
+    print(
+        "\033[1;32mSilahkan Ambil Password Pada Link Di Bawah Ini\033[1;0m\nhttp://jejakainc.com/Password/"
+    )
+    pw = c.get("http://jejakainc.com/Password/Passw.txt")
+    if not os.path.exists(".password/password.txt"):
+        f = open(".password/password.txt", "w+")
+        f.write("wkwkwkwkw")
+        f.close()
 
-						# Parse the html of url
-						(status_code, text_response) = get_response(url)
-						parse_data = BeautifulSoup(text_response, 'html.parser')
-						captcha = parse_data.find('div', {'class':'g-recaptcha'})
-						
-						# Captcha detected
-						if captcha is not None:
-							print_msg_time(Fore.RED + 'Captcha detected!'+ Fore.RED +' Skipping ads...\n')
-										
-							# Clicks the skip
-							await client(GetBotCallbackAnswerRequest(
-								peer=url_channel,
-								msg_id=event.message.id,
-								data=event.message.reply_markup.rows[1].buttons[1].data
-							))		
-			
-		# Print earned money
-		@client.on(events.NewMessage(chats=url_channel, incoming=True))
-		async def wait_hours(event):
-			message = event.raw_text
-			if 'You earned' in message:	
-				print_msg_time(Fore.GREEN + f'{message}' + Fore.RESET)
-		# Balance Check
-			#======== Start print balance
-		#@client.on(events.NewMessage(chats=url_channel, incoming=True))
-		#async def account_balance(event):
-			#message = event.raw_text
-			#if 'Available balance' in message:	
-				#print_msg_time(Fore.YELLOW + f'{message}\n' + Fore.RESET)
-			# Print earned money
-		@client.on(events.NewMessage(chats=url_channel, incoming=True))
-		async def manual_skip(event):
-			message = event.raw_text
-			if 'Skipping task...' in message:	
-				print_msg_time(Fore.YELLOW + f'{message}' + Fore.RESET)
-		# No longer valid
-		@client.on(events.NewMessage(chats=url_channel, incoming=True))
-		async def no_valid(event):
-			message = event.raw_text
-			if 'Sorry, that task is no longer valid' in message:	
-				print_msg_time(Fore.RED + 'Sorry, that task is no longer valid.' + Fore.RESET)
-				print_msg_time(Fore.YELLOW + 'Sending /visit command' + Fore.RESET)
-				await client.send_message(url_channel, '/visit')
-		# No more ads
-		@client.on(events.NewMessage(chats=url_channel, incoming=True))
-		async def no_ads(event):
-			message = event.raw_text
-			if 'no new ads available' in message:	
-				print_msg_time(Fore.RED + 'Sorry, there are no new ads available\n' + Fore.RESET)
-				e = input('Press any key to exit...')
-				exit(1)
-	elif answer == action[1]:
-		print(action[1] + " performed")
-				# Check if phone number is not specified
-		if len(sys.argv) < 2:
-			print('Usage: python start.py phone_number')
-			print('-> Input number in international format (example: +639162995600)\n')
-			e = input('Press any key to exit...')
-			exit(1)
-			
-		phone_number = sys.argv[1]
-		
-		if not os.path.exists("session"):
-			os.mkdir("session")
-	   
-		
-		# Connect to client
-		client = TelegramClient('session/' + phone_number, api_id, api_hash)
-		await client.start(phone_number)
-		me = await client.get_me()
-		ads_channel = "Egyairdrob"
-		await client(JoinChannelRequest(ads_channel))
-		ads_group = "egyairdeop"
-		await client(JoinChannelRequest(ads_group))
-		print('Current account:' + Fore.CYAN + f'  {me.first_name} {me.last_name}  ({me.username})\n' + Fore.RESET)
-		print_msg_time('Sending /join command')
-		
-		# Start command /join
-		await client.send_message(url_channel, '/join')
-		
-		# Join the channel
-		@client.on(events.NewMessage(chats=url_channel, incoming=True))
-		async def join_start(event):
-			message = event.raw_text
-			if 'You must join' in message:	
-				channel_name = re.search(r'You must join @(.*?) to earn', message).group(1)
-				print_msg_time(Fore.WHITE + f'Joining @{channel_name}...')
-				
-				# Join the channel
-				await client(JoinChannelRequest(channel_name))
-				print_msg_time(Fore.WHITE + f'Verifying...')
-				
-				# Clicks the joined
-				await client(GetBotCallbackAnswerRequest(
-					peer=url_channel,
-					msg_id=event.message.id,
-					data=event.message.reply_markup.rows[0].buttons[1].data
-				))
-		
-		# Print waiting hours
-		@client.on(events.NewMessage(chats=url_channel, incoming=True))
-		async def wait_hours(event):
-			message = event.raw_text
-			if 'You must stay' in message:	
-				waiting_hours = re.search(r'at least (.*?) to earn', message).group(1)
-				print_msg_time(Fore.GREEN + f'Success! Please wait {waiting_hours} to earn reward\n' + Fore.RESET)
-				
-		# No more ads
-		@client.on(events.NewMessage(chats=url_channel, incoming=True))
-		async def no_ads(event):
-			message = event.raw_text
-			if 'no new ads available' in message:	
-				print_msg_time(Fore.RED + 'Sorry, there are no new ads available\n' + Fore.RESET)
-				e = input('Press any key to exit...')
-				exit(1)
-	else:
-		print("You insert nothing which me no action. Exit..")
-		exit
+    for i in range(99):
+        f = open(".password/password.txt", "r")
+        if f.readlines()[0] == pw.text:
+            sys.stdout.write("\r                                                \r")
+            sys.stdout.write("\r\033[1;32mUsing Exiting Password....!")
+            break
+        pwin = input("\033[1;32mEnter Password \033[1;30m:\033[1;0m ")
+        if pwin == pw.text:
+            f = open(".password/password.txt", "w+")
+            f.write(pwin)
+            f.close()
+            break
+        else:
+            print("\033[1;31mPassword Salah...!")
+            if i > 1:
+                print(
+                    "\033[1;33mSilahkan Check Password Pada Link Di Bawah Ini\n\033[1;0mhttp://jejakainc.com/Password/"
+                )
+                sys.exit()
 
-	
-	await client.run_until_disconnected()
-	
-asyncio.get_event_loop().run_until_complete(main())
+
+def tunggu(x):
+    sys.stdout.write("\r")
+    sys.stdout.write("                                                               ")
+    for remaining in range(x, 0, -1):
+        sys.stdout.write("\r")
+        sys.stdout.write(
+            "\033[1;30m#\033[1;0m{:2d} \033[1;32mseconds remaining".format(remaining)
+        )
+        sys.stdout.flush()
+        sleep(1)
+
+
+ua = {
+    "User-Agent": "Mozilla/5.0 (Linux; Android 5.1; A1603 Build/LMY47I; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/43.0.2357.121 Mobile Safari/537.36"
+}
+
+
+api_id = 717425
+api_hash = "322526d2c3350b1d3530de327cf08c07"
+phone_number = sys.argv[1]
+
+client = TelegramClient("session/" + phone_number, api_id, api_hash)
+client.connect()
+if not client.is_user_authorized():
+    try:
+        client.send_code_request(phone_number)
+        me = client.sign_in(phone_number, input("\n\n\n\033[1;0mEnter Your Code : "))
+    except SessionPasswordNeededError:
+        passw = input("\033[1;0mYour 2fa Password : ")
+        me = client.start(phone_number, passw)
+myself = client.get_me()
+os.system("clear")
+print(banner)
+print(
+    "\033[1;32mWelcome To TeleBot",
+    myself.first_name,
+    "\n\033[1;32mBot Ini Di Gunakan Untuk Menuyul LTC Click Bot",
+)
+
+
+#password()
+print("\n\n\033[1;37mMemulai Menuyul......!")
+try:
+    channel_entity = client.get_entity("@Litecoin_click_bot")
+    channel_username = "@Litecoin_click_bot"
+    for i in range(5000000):
+        sys.stdout.write("\r")
+        sys.stdout.write(
+            "                                                              "
+        )
+        sys.stdout.write("\r")
+        sys.stdout.write("\033[1;30m# \033[1;33mMencoba Mengambil URL")
+        sys.stdout.flush()
+        client.send_message(entity=channel_entity, message="🖥 Visit sites")
+        sleep(3)
+        posts = client(
+            GetHistoryRequest(
+                peer=channel_entity,
+                limit=1,
+                offset_date=None,
+                offset_id=0,
+                max_id=0,
+                min_id=0,
+                add_offset=0,
+                hash=0,
+            )
+        )
+        if (
+            posts.messages[0].message.find("Sorry, there are no new ads available")
+            != -1
+        ):
+            print("\n\033[1;30m# \033[1;31mIklan Sudah Habis Coba Lagi Besok\n")
+            client.send_message(entity=channel_entity, message="💰 Balance")
+            sleep(5)
+            posts = client(
+                GetHistoryRequest(
+                    peer=channel_entity,
+                    limit=1,
+                    offset_date=None,
+                    offset_id=0,
+                    max_id=0,
+                    min_id=0,
+                    add_offset=0,
+                    hash=0,
+                )
+            )
+            message = posts.messages[0].message
+            print(message)
+            sys.exit()
+        else:
+            try:
+                url = posts.messages[0].reply_markup.rows[0].buttons[0].url
+                sys.stdout.write("\r")
+                sys.stdout.write("\033[1;30m# \033[1;33mVisit " + url)
+                sys.stdout.flush()
+                id = posts.messages[0].id
+                r = c.get(url, headers=ua, timeout=15, allow_redirects=True)
+                soup = BeautifulSoup(r.content, "html.parser")
+                if (
+                    soup.find("div", class_="g-recaptcha") is None
+                    and soup.find("div", id="headbar") is None
+                ):
+                    sleep(2)
+                    posts = client(
+                        GetHistoryRequest(
+                            peer=channel_entity,
+                            limit=1,
+                            offset_date=None,
+                            offset_id=0,
+                            max_id=0,
+                            min_id=0,
+                            add_offset=0,
+                            hash=0,
+                        )
+                    )
+                    message = posts.messages[0].message
+                    if (
+                        posts.messages[0].message.find("You must stay") != -1
+                        or posts.messages[0].message.find("Please stay on") != -1
+                    ):
+                        sec = re.findall(r"([\d.]*\d+)", message)
+                        tunggu(int(sec[0]))
+                        sleep(1)
+                        posts = client(
+                            GetHistoryRequest(
+                                peer=channel_entity,
+                                limit=2,
+                                offset_date=None,
+                                offset_id=0,
+                                max_id=0,
+                                min_id=0,
+                                add_offset=0,
+                                hash=0,
+                            )
+                        )
+                        messageres = posts.messages[1].message
+                        sleep(2)
+                        sys.stdout.write("\r\033[1;30m# \033[1;32m" + messageres + "\n")
+                    else:
+                        pass
+
+                elif soup.find("div", id="headbar") is not None:
+                    for dat in soup.find_all("div", class_="container-fluid"):
+                        code = dat.get("data-code")
+                        timer = dat.get("data-timer")
+                        tokena = dat.get("data-token")
+                        tunggu(int(timer))
+                        r = c.post(
+                            "https://dogeclick.com/reward",
+                            data={"code": code, "token": tokena},
+                            headers=ua,
+                            timeout=15,
+                            allow_redirects=True,
+                        )
+                        js = json.loads(r.text)
+                        sys.stdout.write(
+                            "\r\033[1;30m# \033[1;32mYou earned "
+                            + js["reward"]
+                            + " LTC for visiting a site!\n"
+                        )
+                else:
+                    sys.stdout.write("\r")
+                    sys.stdout.write(
+                        "                                                                "
+                    )
+                    sys.stdout.write("\r")
+                    sys.stdout.write("\033[1;30m# \033[1;31mCaptcha Detected")
+                    sys.stdout.flush()
+                    sleep(2)
+                    client(
+                        GetBotCallbackAnswerRequest(
+                            channel_username,
+                            id,
+                            data=posts.messages[0].reply_markup.rows[1].buttons[1].data,
+                        )
+                    )
+                    sys.stdout.write(
+                        "\r\033[1;30m# \033[1;31mSkip Captcha...!       \n"
+                    )
+                    sleep(2)
+            except:
+                sleep(3)
+                posts = client(
+                    GetHistoryRequest(
+                        peer=channel_entity,
+                        limit=1,
+                        offset_date=None,
+                        offset_id=0,
+                        max_id=0,
+                        min_id=0,
+                        add_offset=0,
+                        hash=0,
+                    )
+                )
+                message = posts.messages[0].message
+                if (
+                    posts.messages[0].message.find("You must stay") != -1
+                    or posts.messages[0].message.find("Please stay on") != -1
+                ):
+                    sec = re.findall(r"([\d.]*\d+)", message)
+                    tunggu(int(sec[0]))
+                    sleep(1)
+                    posts = client(
+                        GetHistoryRequest(
+                            peer=channel_entity,
+                            limit=2,
+                            offset_date=None,
+                            offset_id=0,
+                            max_id=0,
+                            min_id=0,
+                            add_offset=0,
+                            hash=0,
+                        )
+                    )
+                    messageres = posts.messages[1].message
+                    sleep(2)
+                    sys.stdout.write("\r\033[1;30m# \033[1;32m" + messageres + "\n")
+                else:
+                    pass
+
+finally:
+    client.disconnect()
